@@ -1,3 +1,29 @@
+  function takePhoto(){
+  const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+      const track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
+      let image = imageCapture.grabFrame().then((bitmap) =>{
+
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        var link = document.createElement('a');
+        link.download = "test.png";
+        link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        link.click();
+         });
+      });
+}
+
+
 var scene1 = `<!--SCENE1 MENU BUTTON-->
       <a-entity id="scene1" >
         <a-box
@@ -53,7 +79,7 @@ var scene2 = `<!--SCENE2 ACTUAL MENU-->
             side="double"
           ></a-text
         ></a-box>
-        <a-box color="grey" position="0 -1.6 0" scale="4 1 0.1">
+        <a-box color="grey" position="0 -1.6 0" scale="4 1 0.1" onclick="takePhoto()">
           <a-text
             value="CAM"
             position="-0.5 0 1"
@@ -351,6 +377,7 @@ function showMenu(){
 function deleteMenu(){
   document.getElementById("menu").innerHTML = ``;
 }
+
 
 
 function nextScene(clickedID, id) {

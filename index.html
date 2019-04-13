@@ -113,11 +113,66 @@
       
       </a-entity>
     </a-scene>
-    <script type="text/javascript">
-      document.addEventListener('click',(event) => {
-        
+    <video id="player" controls autoplay></video>
+<canvas id="canvas" width=800 height=600></canvas>
+<script>
+  const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+
+  document.addEventListener('keypress',(event) =>{
+    if (event.key == "e")
+    {
+      navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+      const track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
+      let image = imageCapture.grabFrame().then((bitmap) =>{
+
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        var link = document.createElement('a');
+        link.download = "test.png";
+        link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        link.click();
       });
-    </script>
+      });
+      
+    }
+
+  });
+
+  function takePhoto(){
+    const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+      const track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
+      let image = imageCapture.grabFrame().then((bitmap) =>{
+
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        var link = document.createElement('a');
+        link.download = "test.png";
+        link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        link.click();
+         });
+      });
+}
+
+</script>
   </body>
 </html>
 
