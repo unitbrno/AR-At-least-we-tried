@@ -1,0 +1,181 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script rel="preload" src="aframe.js"></script>
+    <script src="AFRAMEscripts.js"></script>
+    <script rel="preload" type="text/javascript" src="menu.js"></script>
+    <script type="text/javascript">
+      document.addEventListener('touchend',(event) => {
+        var menu = document.getElementById('menu');
+        var cam = document.getElementById('cam');
+        var camRot = cam.getAttribute('rotation');
+
+        var oldYAngle = menu.getAttribute('angleY');
+        var oldXAngle = menu.getAttribute('angleX');
+        var oldZAngle = menu.getAttribute('angleZ');
+
+        var camY = (camRot.y * Math.PI / 180)-oldYAngle;
+        var camX = (camRot.x * Math.PI / 180)-oldXAngle;
+        var camZ = (camRot.z * Math.PI / 180)-oldZAngle;
+
+        var menuPos = menu.getAttribute('position');
+        menu.setAttribute('angleY', (camRot.y * Math.PI / 180));
+        menu.setAttribute('angleX', (camRot.x * Math.PI / 180));
+        menu.setAttribute('angleZ', (camRot.z * Math.PI / 180));
+
+
+        var angleForRotation = camY * 180 / Math.PI;
+        var oldRotationY = menu.getAttribute('rotation').y;
+        var newRotationY = oldRotationY + angleForRotation;
+        menu.setAttribute('rotation', "0 " + newRotationY + " 0");
+        //console.log();
+        //New rotation Y
+        var newMenuPosX = menuPos.x * Math.cos(camY) + menuPos.z * Math.sin(camY);
+        var newMenuPosZ = -menuPos.x * Math.sin(camY) + menuPos.z * Math.cos(camY);
+
+        menu.setAttribute('position', newMenuPosX + " 2 " + newMenuPosZ );
+        showMenu();
+      })
+    </script>
+    
+  </head>
+  <body>
+    <script type="text/javascript">
+      document.addEventListener('keypress',(event) => {
+        if(event.key == "q"){
+          var menu = document.getElementById('menu');
+        var cam = document.getElementById('cam');
+        var camRot = cam.getAttribute('rotation');
+
+        var oldYAngle = menu.getAttribute('angleY');
+        var oldXAngle = menu.getAttribute('angleX');
+        var oldZAngle = menu.getAttribute('angleZ');
+
+        var camY = (camRot.y * Math.PI / 180)-oldYAngle;
+        var camX = (camRot.x * Math.PI / 180)-oldXAngle;
+        var camZ = (camRot.z * Math.PI / 180)-oldZAngle;
+
+        var menuPos = menu.getAttribute('position');
+        menu.setAttribute('angleY', (camRot.y * Math.PI / 180));
+        menu.setAttribute('angleX', (camRot.x * Math.PI / 180));
+        menu.setAttribute('angleZ', (camRot.z * Math.PI / 180));
+
+
+        var angleForRotation = camY * 180 / Math.PI;
+        var oldRotationY = menu.getAttribute('rotation').y;
+        var newRotationY = oldRotationY + angleForRotation;
+        menu.setAttribute('rotation', "0 " + newRotationY + " 0");
+        //console.log();
+        //New rotation Y
+        var newMenuPosX = menuPos.x * Math.cos(camY) + menuPos.z * Math.sin(camY);
+        var newMenuPosZ = -menuPos.x * Math.sin(camY) + menuPos.z * Math.cos(camY);
+
+        menu.setAttribute('position', newMenuPosX + " 2.5 " + newMenuPosZ );
+        //console.log("xnew:" + newMenuPosX + " ynew:" + " znew:" + newMenuPosZ);
+        //console.log("x:" + menuPos.x + " y:" + menuPos.y);
+        showMenu();
+        }
+      });
+    </script>
+    <a-scene>
+      <a-camera id="cam">
+        <a-entity
+          cursor="fuse: true; fuseTimeout: 700"
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03; thetaLength: 360; thetaStart: 90;"
+          material="color: grey; shader: flat"
+        >
+          <a-animation
+            begin="fusing"
+            attribute="geometry.thetaLength"
+            from="0"
+            to="360"
+            dur="700"
+          ></a-animation>
+
+          <a-animation
+            begin="click"
+            attribute="geometry.thetaLength"
+            from="360"
+            to="0"
+            dur="250"
+          ></a-animation>
+        </a-entity>
+        <a-entity
+          position="0 0 -1.0001"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03;"
+          material="color: #2ADD2A;"
+        >
+        </a-entity>
+      </a-camera>
+      <a-entity angleY="0" angleX="0" angleZ="0" rotation="0 0 0" position="0 -5 -10" id="menu">
+      
+      </a-entity>
+    </a-scene>
+    <video id="player" controls autoplay></video>
+<canvas id="canvas" width=800 height=600></canvas>
+<script>
+  const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+
+  document.addEventListener('keypress',(event) =>{
+    if (event.key == "e")
+    {
+      navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+      const track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
+      let image = imageCapture.grabFrame().then((bitmap) =>{
+
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        var link = document.createElement('a');
+        link.download = "test.png";
+        link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        link.click();
+      });
+      });
+      
+    }
+
+  });
+
+  function takePhoto(){
+    const player = document.getElementById('player');
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  const captureButton = document.getElementById('capture');
+
+  const constraints = {
+    video: true,
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+      const track = stream.getVideoTracks()[0];
+      let imageCapture = new ImageCapture(track);
+      let image = imageCapture.grabFrame().then((bitmap) =>{
+
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+        var link = document.createElement('a');
+        link.download = "test.png";
+        link.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        link.click();
+         });
+      });
+}
+
+</script>
+  </body>
+</html>
+
+
+
+
